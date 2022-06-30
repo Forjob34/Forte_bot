@@ -13,6 +13,4 @@ logging.basicConfig(
 )
 
 
-# TOKEN = os.environ.get("token")
-
-TOKEN = '1637667630:AAFw7d_ulJuUG5ruYXxP_xWZlwF779cCGzg'
+TOKEN = os.environ.get("token")
