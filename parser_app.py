@@ -1,5 +1,6 @@
-import requests
 from bs4 import BeautifulSoup
+from datetime import datetime, date
+import requests
 import time
 
 
@@ -27,9 +28,9 @@ def parser_two():
         'div', {'id': 'block-views-block-glavnaya-vygruzka-block-1'})
     price_table = table.find_all('div', {'class': 'itemContent'})
     pr_1 = price_table[18].find('div', {'class': 'priceValue'}).text.replace(
-        '.', '').replace('$', '')
+        '.', '').replace('руб', '')
     pr_2 = price_table[19].find('div', {'class': 'priceBlock'}).text.replace(
-        '.', '').replace('$', '')
+        '.', '').replace('руб', '')
     # pr_1 = int(pr_1)
     # pr_2 = int(pr_2)
     # if len(str(pr_1)) == 2:
@@ -42,10 +43,13 @@ def parser_two():
     #     pr_p_2 = (int(pr_2)*10)
     # price_fin = str(pr_p)[0] + ' ' + str(pr_p)[1:]
     # price_fin_2 = str(pr_p_2)[0] + ' ' + str(pr_p_2)[1:]
+
+    pr_1 = int(pr_1) * 1000
+    pr_2 = int(pr_2) * 1000
     result_one = price_table[18].find(
-        'div', {'class': 'name'}).text + ' = ' + pr_1
+        'div', {'class': 'name'}).text + ' = ' + str(pr_1)
     result_two = price_table[19].find(
-        'div', {'class': 'name'}).text + ' = ' + pr_2
+        'div', {'class': 'name'}).text + ' = ' + str(pr_2)
     return result_one.replace('\n', ''), result_two.replace('\n', '')
 
 
@@ -80,19 +84,36 @@ def parser_three():
     return res_one, res_two, res_three
 
 
+def cb_course():
+    current_date = date.today().strftime('%d/%m/%Y')
+    # url = 'https://www.cbr.ru/scripts/XML_daily.asp?date_req=' + current_date
+    url = 'https://www.cbr-xml-daily.ru/daily_eng_utf8.xml'
+    print(url)
+    req = requests.get(url)
+    soup = BeautifulSoup(req.text, 'xml')
+    table = soup.find_all('Name')
+    print(len(table))
+    for i in table:
+        print(i)
+
+
 if __name__ == '__main__':
+    # try:
+    #     f_1 = parser_one()
+    #     print(f_1)
+    # except Exception as e:
+    #     print(e)
+    # try:
+    #     f_2 = parser_two()
+    #     print(f_2)
+    # except Exception as e:
+    #     print(e)
+    # try:
+    #     f_3 = parser_three()
+    #     print(f_3)
+    # except Exception as e:
+    #     print(e)
     try:
-        f_3 = parser_three()
-        print(f_3)
-    except Exception as e:
-        print(e)
-    try:
-        f_1 = parser_one()
-        print(f_1)
-    except Exception as e:
-        print(e)
-    try:
-        f_2 = parser_two()
-        print(f_2)
-    except Exception as e:
-        print(e)
+        cb_course()
+    except Exception as err:
+        print(err)

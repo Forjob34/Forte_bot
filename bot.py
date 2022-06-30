@@ -20,6 +20,7 @@ db = SQLighter('db.db')
 @dp.message_handler(commands=['start'])
 async def start_bot(message: types.Message):
     me = await bot.get_me()
+    print(me)
     keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 
     if (not db.subscriber_exists(message.from_user.id)):
@@ -53,7 +54,7 @@ async def check_price(message: types.Message):
         await message.answer(f'<u><b>Юг-Мет:</b></u>\n\nНе удалось получить данные, попробуйте позже.')
     try:
         res_two = parser_two()
-        await message.answer(f'<u><b>ФЕРРАТЕК:</b></u>\n\n{res_two[0]} \n{res_two[1]} ')
+        await message.answer(f'<u><b>ФЕРРАТЕК:</b></u>\n\n{res_two[0]} ₽\n{res_two[1]} ₽')
     except Exception:
         await message.answer(f'<u><b>ФЕРРАТЕК:</b></u>\n\nНе удалось получить данные, попробуйте позже.')
     try:
@@ -63,14 +64,17 @@ async def check_price(message: types.Message):
         await message.answer(f'<u><b>РусЛом61:</b></u>\n\nНе удалось получить данные, попробуйте позже.')
 
 
-@dp.message_handler(lambda message: message.text == 'Отписаться на рассылки')
+@dp.message_handler(lambda message: message.text == 'Отписаться от рассылки')
 async def unsubscribe(message: types.Message):
     if(not db.subscriber_exists(message.from_user.id)):
         db.add_subscriber(message.from_user.id, False)
         await message.answer('Вы итак не подписаны')
     else:
-        db.delete_subscribtion(message.from_user.id)
-        await message.answer('Вы отписались от рассылки\nВсего хорошего!', reply_markup=types.ReplyKeyboardRemove())
+        try:
+            db.delete_subscribtion(message.from_user.id)
+            await message.answer('Вы отписались от рассылки\nВсего хорошего!', reply_markup=types.ReplyKeyboardRemove())
+        except Exception as err:
+            print(err)
 
 
 async def scheduled(wait_for):
@@ -94,7 +98,7 @@ async def scheduled(wait_for):
                 res_two = parser_two()
                 for sub in subscribers:
                     try:
-                        await bot.send_message(sub[1], f'<u><b>ФЕРРАТЕК:</b></u>\n\n{res_two[0]} \n{res_two[1]} ')
+                        await bot.send_message(sub[1], f'<u><b>ФЕРРАТЕК:</b></u>\n\n{res_two[0]} ₽\n{res_two[1]} ₽')
                     except Exception:
                         print('Bot block')
             except Exception:
@@ -115,6 +119,7 @@ async def scheduled(wait_for):
 
 
 if __name__ == '__main__':
+    # print('[INFO] -- Start pooling')
     loop = asyncio.get_event_loop()
     loop.create_task(scheduled(1))
     executor.start_polling(dp, skip_updates=True)
